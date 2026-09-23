@@ -90,21 +90,22 @@ export default function Header() {
           <div className="flex items-center gap-2.5">
             <a
               href="#faq"
-              className="hidden font-mono text-xs uppercase tracking-widest text-ink-soft underline-offset-4 hover:underline md:block"
+              className="hidden font-mono text-xs uppercase tracking-widest text-ink-soft underline-offset-4 hover:underline focus-visible:underline md:block"
             >
               Sign in
             </a>
             <a
               href="#generator"
-              className="card-hard-sm hidden items-center gap-1.5 rounded-md bg-lime px-4 py-2 text-sm font-bold sm:flex"
+              className="card-hard-sm hidden items-center gap-1.5 rounded-md bg-lime px-4 py-2 text-sm font-bold transition-transform hover:-translate-y-0.5 focus-visible:-translate-y-0.5 sm:flex"
             >
               <IconZap className="h-4 w-4" />
               Start free
             </a>
             <button
               onClick={() => setOpen((v) => !v)}
-              aria-label="Toggle menu"
-              className="card-hard-sm rounded-md bg-cream p-2 lg:hidden"
+              aria-label={open ? "Close menu" : "Open menu"}
+              aria-expanded={open}
+              className="card-hard-sm rounded-md bg-cream p-2 transition-transform hover:scale-105 focus-visible:scale-105 lg:hidden"
             >
               {open ? <IconClose className="h-5 w-5" /> : <IconMenuBurger className="h-5 w-5" />}
             </button>
@@ -116,15 +117,17 @@ export default function Header() {
           className={`grid overflow-hidden transition-all duration-300 lg:hidden ${
             open ? "grid-rows-[1fr] border-t border-ink" : "grid-rows-[0fr]"
           }`}
+          aria-hidden={!open}
         >
           <div className="min-h-0">
-            <nav className="flex flex-col gap-1 px-4 py-4">
+            <nav aria-label="Mobile navigation" className="flex flex-col gap-1 px-4 py-4">
               {NAV.map((n, i) => (
                 <a
                   key={n.href}
                   href={n.href}
                   onClick={() => setOpen(false)}
-                  className="flex items-center justify-between rounded-md px-3 py-2.5 font-display text-lg font-bold hover:bg-ink hover:text-lime"
+                  tabIndex={open ? 0 : -1}
+                  className="flex items-center justify-between rounded-md px-3 py-2.5 font-display text-lg font-bold hover:bg-ink hover:text-lime focus-visible:bg-ink focus-visible:text-lime"
                 >
                   {n.label}
                   <span className="font-mono text-xs text-verm">0{i + 1}</span>
@@ -133,7 +136,8 @@ export default function Header() {
               <a
                 href="#generator"
                 onClick={() => setOpen(false)}
-                className="card-hard-sm mt-2 rounded-md bg-lime px-4 py-3 text-center font-bold"
+                tabIndex={open ? 0 : -1}
+                className="card-hard-sm mt-2 rounded-md bg-lime px-4 py-3 text-center font-bold transition-transform hover:-translate-y-0.5 focus-visible:-translate-y-0.5"
               >
                 Start free — no signup
               </a>

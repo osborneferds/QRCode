@@ -180,13 +180,14 @@ export const CONTENT_TABS: { id: ContentType; label: string }[] = [
 const escWifi = (s: string) => s.replace(/([\\;,:"])/g, "\\$1");
 
 export function buildContent(c: ContentState): string {
-  switch (c.type) {
-    case "url": {
-      let u = c.url.trim();
-      if (!u) return "";
-      if (!/^[a-z][a-z0-9+.-]*:/i.test(u)) u = "https://" + u;
-      return u;
-    }
+  try {
+    switch (c.type) {
+      case "url": {
+        let u = c.url.trim();
+        if (!u) return "";
+        if (!/^[a-z][a-z0-9+.-]*:/i.test(u)) u = "https://" + u;
+        return u;
+      }
     case "text":
       return c.text.trim();
     case "wifi":
@@ -228,6 +229,10 @@ export function buildContent(c: ContentState): string {
       ];
       return lines.filter((l): l is string => Boolean(l)).join("\n");
     }
+  }
+  } catch (error) {
+    console.error("[QRForge] Error building content:", error);
+    return "";
   }
 }
 

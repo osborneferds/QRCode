@@ -280,15 +280,34 @@ export default function Generator() {
 
   /* ---------------------- downloads ---------------------- */
   const fileBase = (qrName.trim() || `qrforge-${shortId}`).toLowerCase().replace(/[^a-z0-9-_]+/g, "-");
+  const [downloading, setDownloading] = useState(false);
 
   const downloadPng = async () => {
-    const blob = await hiQrRef.current?.getRawData("png");
-    if (blob) saveBlob(blob, `${fileBase}.png`);
+    if (!hiQrRef.current || downloading) return;
+    setDownloading(true);
+    try {
+      const blob = await hiQrRef.current.getRawData("png");
+      if (blob) saveBlob(blob, `${fileBase}.png`);
+    } catch (error) {
+      console.error("[QRForge] PNG download failed:", error);
+      alert("Failed to download PNG. Please try again.");
+    } finally {
+      setDownloading(false);
+    }
   };
 
   const downloadSvg = async () => {
-    const blob = await hiQrRef.current?.getRawData("svg");
-    if (blob) saveBlob(blob, `${fileBase}.svg`);
+    if (!hiQrRef.current || downloading) return;
+    setDownloading(true);
+    try {
+      const blob = await hiQrRef.current.getRawData("svg");
+      if (blob) saveBlob(blob, `${fileBase}.svg`);
+    } catch (error) {
+      console.error("[QRForge] SVG download failed:", error);
+      alert("Failed to download SVG. Please try again.");
+    } finally {
+      setDownloading(false);
+    }
   };
 
   const downloadSticker = async () => {
@@ -331,12 +350,29 @@ export default function Generator() {
 
   /* ---------------------- actions ---------------------- */
   const copyShort = async () => {
+    const text = `https://${shortLink(shortId)}`;
     try {
-      await navigator.clipboard.writeText(`https://${shortLink(shortId)}`);
+      await navigator.clipboard.writeText(text);
       setCopied(true);
       setTimeout(() => setCopied(false), 1600);
-    } catch {
-      /* clipboard blocked */
+    } catch (error) {
+      console.error("[QRForge] Copy failed:", error);
+      // Fallback for older browsers
+      const textArea = document.createElement("textarea");
+      textArea.value = text;
+      textArea.style.position = "fixed";
+      textArea.style.opacity = "0";
+      document.body.appendChild(textArea);
+      textArea.select();
+      try {
+        document.execCommand("copy");
+        setCopied(true);
+        setTimeout(() => setCopied(false), 1600);
+      } catch (err) {
+        console.error("[QRForge] Fallback copy failed:", err);
+        alert("Failed to copy. Please copy manually: " + text);
+      }
+      document.body.removeChild(textArea);
     }
   };
 
@@ -444,18 +480,21 @@ export default function Generator() {
                 <h2 className="font-mono text-xs uppercase tracking-[0.22em]">
                   <span className="text-verm">01</span> · Content
                 </h2>
-                <div className="flex flex-wrap gap-1">
+                <div className="flex flex-wrap gap-1" role="tablist" aria-label="Content type">
                   {CONTENT_TABS.map((t) => {
                     const Ic = TAB_ICON[t.id];
                     const active = content.type === t.id;
                     return (
                       <button
                         key={t.id}
+                        role="tab"
+                        aria-selected={active}
+                        aria-controls={`content-panel-${t.id}`}
                         onClick={() => setC({ type: t.id })}
                         className={`flex items-center gap-1.5 rounded-md px-2.5 py-1.5 text-xs font-bold transition-all ${
                           active
                             ? "bg-ink text-lime shadow-[2px_2px_0_0_#c9e964]"
-                            : "text-ink-soft hover:bg-sage"
+                            : "text-ink-soft hover:bg-sage focus-visible:bg-sage"
                         }`}
                       >
                         <Ic className="h-3.5 w-3.5" />
@@ -466,7 +505,12 @@ export default function Generator() {
                 </div>
               </div>
 
-              <div className="grid gap-4 p-5 sm:grid-cols-2">
+              <div
+                id={`content-panel-${content.type}`}
+                role="tabpanel"
+                aria-labelledby={`tab-${content.type}`}
+                className="grid gap-4 p-5 sm:grid-cols-2"
+              >
                 {content.type === "url" && (
                   <Field label="Website or page URL" className="sm:col-span-2">
                     <input
@@ -978,22 +1022,46 @@ export default function Generator() {
               <div className="mt-4 grid grid-cols-2 gap-2.5">
                 <button
                   onClick={downloadPng}
-                  className="card-hard-sm col-span-2 flex items-center justify-center gap-2 rounded-md bg-lime px-4 py-3 text-sm font-extrabold text-ink"
+                  disabled={downloading}
+                  aria-label="Download QR code as PNG"
+                  className="card-hard-sm col-span-2 flex items-center justify-center gap-2 rounded-md bg-lime px-4 py-3 text-sm font-extrabold text-ink disabled:opacity-50 disabled:cursor-not-allowed"
                 >
-                  <IconDownload className="h-4 w-4" /> Download PNG · 1200px
+                  {downloading ? (
+                    <>
+                      <span className="h-4 w-4 animate-spin rounded-full border-2 border-ink border-t-transparent" />
+                      Preparing...
+                    </>
+                  ) : (
+                    <>
+                      <IconDownload className="h-4 w-4" /> Download PNG · 1200px
+                    </>
+                  )}
                 </button>
                 <button
                   onClick={downloadSvg}
-                  className="flex items-center justify-center gap-2 rounded-md border-[1.5px] border-paper/40 px-4 py-2.5 text-sm font-bold text-paper transition hover:border-lime hover:text-lime"
+                  disabled={downloading}
+                  aria-label="Download QR code as SVG"
+                  className="flex items-center justify-center gap-2 rounded-md border-[1.5px] border-paper/40 px-4 py-2.5 text-sm font-bold text-paper transition hover:border-lime hover:text-lime disabled:opacity-50 disabled:cursor-not-allowed"
                 >
-                  <IconDownload className="h-4 w-4" /> Vector SVG
+                  {downloading ? (
+                    <span className="h-3.5 w-3.5 animate-spin rounded-full border-2 border-paper border-t-transparent" />
+                  ) : (
+                    <IconDownload className="h-4 w-4" />
+                  )}
+                  Vector SVG
                 </button>
                 <button
                   onClick={downloadSticker}
-                  disabled={sticker.id === "none"}
+                  disabled={sticker.id === "none" || downloading}
+                  aria-label="Download QR code with sticker frame"
                   className="flex items-center justify-center gap-2 rounded-md border-[1.5px] border-paper/40 px-4 py-2.5 text-sm font-bold text-paper transition enabled:hover:border-verm enabled:hover:text-verm disabled:cursor-not-allowed disabled:opacity-35"
                 >
-                  <IconSparkle className="h-4 w-4" /> Sticker PNG
+                  {downloading ? (
+                    <span className="h-3.5 w-3.5 animate-spin rounded-full border-2 border-paper border-t-transparent" />
+                  ) : (
+                    <IconSparkle className="h-4 w-4" />
+                  )}
+                  Sticker PNG
                 </button>
               </div>
               <p className="mt-3 text-center font-mono text-[10px] uppercase tracking-[0.18em] text-paper/40">

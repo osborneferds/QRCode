@@ -51,13 +51,27 @@ export default function SavedCodes() {
 
   const copy = async (item: SavedQR) => {
     try {
-      await navigator.clipboard.writeText(
-        item.dynamic ? `https://${shortLink(item.shortId)}` : item.data
-      );
+      const text = item.dynamic ? `https://${shortLink(item.shortId)}` : item.data;
+      await navigator.clipboard.writeText(text);
       setCopiedId(item.id);
       setTimeout(() => setCopiedId(null), 1400);
-    } catch {
-      /* clipboard blocked */
+    } catch (error) {
+      console.error("[QRForge] Copy failed:", error);
+      // Fallback for older browsers
+      const textArea = document.createElement("textarea");
+      textArea.value = item.dynamic ? `https://${shortLink(item.shortId)}` : item.data;
+      textArea.style.position = "fixed";
+      textArea.style.opacity = "0";
+      document.body.appendChild(textArea);
+      textArea.select();
+      try {
+        document.execCommand("copy");
+        setCopiedId(item.id);
+        setTimeout(() => setCopiedId(null), 1400);
+      } catch (err) {
+        console.error("[QRForge] Fallback copy failed:", err);
+      }
+      document.body.removeChild(textArea);
     }
   };
 

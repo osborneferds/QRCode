@@ -1,5 +1,46 @@
 @import "tailwindcss";
 
+/* Skip to content link for accessibility */
+.skip-to-content {
+  position: absolute;
+  left: -9999px;
+  top: auto;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  z-index: 9999;
+  background: var(--color-lime);
+  color: var(--color-ink);
+  padding: 0.75rem 1.5rem;
+  font-weight: 700;
+  text-decoration: none;
+  border: 2px solid var(--color-ink);
+}
+
+.skip-to-content:focus {
+  position: fixed;
+  top: 10px;
+  left: 10px;
+  width: auto;
+  height: auto;
+  overflow: visible;
+}
+
+/* Improved focus styles */
+*:focus-visible {
+  outline: 3px solid var(--color-verm);
+  outline-offset: 2px;
+}
+
+button:focus-visible,
+a:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible {
+  outline: 3px solid var(--color-verm);
+  outline-offset: 2px;
+}
+
 @theme {
   --color-paper: #f2f2e8;
   --color-cream: #fbfbf3;
