@@ -23,13 +23,11 @@
     
     <!-- Open Graph / Facebook -->
     <meta property="og:type" content="website" />
-    <meta property="og:url" content="https://qrforge.app/" />
     <meta property="og:title" content="QRForge — QR Code Generator with Logo" />
     <meta property="og:description" content="Create, customize and track dynamic QR codes with your logo, colors, shapes and stickers. Free QR code generator with analytics." />
     
     <!-- Twitter -->
-    <meta property="twitter:card" content="summary_large_image" />
-    <meta property="twitter:url" content="https://qrforge.app/" />
+    <meta property="twitter:card" content="summary" />
     <meta property="twitter:title" content="QRForge — QR Code Generator with Logo" />
     <meta property="twitter:description" content="Create, customize and track dynamic QR codes with your logo, colors, shapes and stickers. Free QR code generator with analytics." />
     <link
@@ -46,6 +44,24 @@
   <body>
     <a href="#generator" class="skip-to-content">Skip to QR Generator</a>
     <div id="root"></div>
+    <script type="text/javascript">
+      // Single Page Apps for GitHub Pages
+      // https://github.com/rafgraph/spa-github-pages
+      // This script checks to see if a redirect is present in the query string,
+      // converts it back into the correct url and adds it to the
+      // browser's history using window.history.replaceState(...),
+      // which won't let the browser trigger a new request.
+      (function(l) {
+        if (l.search[1] === '/' ) {
+          var decoded = l.search.slice(1).split('&').map(function(s) { 
+            return s.replace(/~and~/g, '&')
+          }).join('?');
+          window.history.replaceState(null, null,
+            l.pathname.slice(0, -1) + decoded + l.hash
+          );
+        }
+      }(window.location))
+    </script>
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>

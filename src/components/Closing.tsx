@@ -191,7 +191,7 @@ function FooterQr() {
     const qr = new QRCodeStyling({
       width: 132,
       height: 132,
-      data: "https://qrforge.app",
+      data: "https://example.com",
       margin: 10,
       qrOptions: { errorCorrectionLevel: "M" },
       dotsOptions: { type: "rounded", color: "#141a12" },

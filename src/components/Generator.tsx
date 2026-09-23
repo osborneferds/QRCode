@@ -238,7 +238,7 @@ export default function Generator() {
       return {
         width: size,
         height: size,
-        data: data || "https://qrforge.app",
+        data: data || "https://example.com",
         margin: Math.round(design.margin * scale),
         qrOptions: {
           errorCorrectionLevel: design.logo ? ("H" as const) : ("M" as const),
@@ -380,7 +380,7 @@ export default function Generator() {
     const item: SavedQR = {
       id: `${Date.now()}-${Math.random().toString(36).slice(2, 7)}`,
       name: qrName.trim() || `${content.type.toUpperCase()} · ${shortLink(shortId)}`,
-      data: data || "https://qrforge.app",
+      data: data || "https://example.com",
       type: content.type,
       dynamic,
       shortId,
@@ -975,7 +975,7 @@ export default function Generator() {
               <div className="mt-5 rounded-lg border border-paper/20 bg-paper/[0.06] px-3.5 py-2.5">
                 <p className="font-mono text-[9px] uppercase tracking-[0.24em] text-paper/50">Payload · {content.type}</p>
                 <p className="mt-1 truncate font-mono text-xs text-lime">
-                  {data || "https://qrforge.app"}
+                  {data || "https://example.com"}
                   <span className="blink-caret ml-0.5 inline-block h-3 w-[7px] translate-y-[2px] bg-lime" />
                 </p>
               </div>
